@@ -15,15 +15,9 @@ func ExampleNew() {
 	fmt.Println(err)
 	fmt.Printf("%+v\n", err)
 
-	err = errors.New("go error, param: %v", 123)
-	fmt.Println(err)
-	fmt.Printf("%+v\n", err)
-
 	// Output:
 	// go error
 	// go error
-	// go error, param: 123
-	// go error, param: 123
 }
 
 func ExampleNewWithCode() {

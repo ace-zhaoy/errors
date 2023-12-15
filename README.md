@@ -1,5 +1,5 @@
 # Errors
-Package errors adds stack trace support for errors in go and supports error code
+Package errors Adds stack trace support for errors in go, along with support for error code and carry messages
 
 # Install
 ```shell
@@ -19,7 +19,7 @@ import (
 	"os"
 )
 
-func OpeFile() error {
+func OpenFile() error {
 	_, err := os.Open("./test.err")
 	return errors.WithStack(err)
 }
@@ -29,7 +29,7 @@ func ReturnNil() error {
 }
 
 func main() {
-	err := OpeFile()
+	err := OpenFile()
 	fmt.Printf("%+v\n", err)
 	fmt.Println("------------")
 
@@ -41,7 +41,7 @@ func main() {
 Output:
 ```shell
 open ./test.err: no such file or directory
-main.OpeFile
+main.OpenFile
         /go/src/test/err/main.go:11
 main.main
         /go/src/test/err/main.go:19
@@ -51,6 +51,7 @@ runtime.goexit
         /usr/local/go/src/runtime/asm_amd64.s:1571
 ------------
 <nil>
+
 ```
 
 #### Example 2

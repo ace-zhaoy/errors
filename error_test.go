@@ -29,7 +29,6 @@ var (
 func TestNew(t *testing.T) {
 	type args struct {
 		format string
-		args   []any
 	}
 	tests := []struct {
 		name    string
@@ -42,14 +41,6 @@ func TestNew(t *testing.T) {
 				format: "abc",
 			},
 			fmt.Errorf("abc"),
-		},
-		{
-			"new format abc:%v 123",
-			args{
-				format: "abc: %v",
-				args:   []any{123},
-			},
-			fmt.Errorf("abc: 123"),
 		},
 		{
 			"new abc - errors.New",
@@ -68,7 +59,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := New(tt.args.format, tt.args.args...); err.Error() != tt.wantErr.Error() {
+			if err := New(tt.args.format); err.Error() != tt.wantErr.Error() {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

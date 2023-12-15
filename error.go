@@ -222,9 +222,9 @@ func stackExists(err error) bool {
 
 // New returns an error with no code but a message
 // New no stack
-func New(format string, args ...any) error {
+func New(message string) error {
 	return &withMessage{
-		message: fmt.Sprintf(format, args...),
+		message: message,
 	}
 }
 
