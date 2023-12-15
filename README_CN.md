@@ -72,8 +72,6 @@ func main() {
 // open ./test.err: no such file or directory
 // invalid params
 // param: ./test.err
-// github.com/ace-zhaoy/errors.(*withMessage).Wrapf
-//         /go/pkg/mod/github.com/ace-zhaoy/errors@v1.0.0/error.go:61
 // main.OpenFile
 //         /go/src/test/err/main.go:17
 // main.main
@@ -180,8 +178,6 @@ func main() {
 // record not found
 // 500201010: user not found
 // param: id: 1
-// github.com/ace-zhaoy/errors.(*withCode).Wrapf
-//         /go/pkg/mod/github.com/ace-zhaoy/errors@v1.0.0/error.go:119
 // main.SqlFirst
 //         /go/src/test/err/main.go:27
 // main.Server

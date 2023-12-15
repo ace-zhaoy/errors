@@ -166,8 +166,6 @@ error err: [400102030: invalid params] -> {param: id: 1 -> {[500201010: user not
 record not found
 500201010: user not found
 param: id: 1
-github.com/ace-zhaoy/errors.(*withCode).Wrapf
-        /go/pkg/mod/github.com/ace-zhaoy/errors@v0.0.0-20231214024624-b6e6a8d322d8/error.go:119
 main.SqlFirst
         /go/src/test/err/main.go:27
 main.Server

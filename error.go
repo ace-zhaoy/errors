@@ -45,11 +45,16 @@ func (w *withMessage) Unwrap() error {
 }
 
 func (w *withMessage) WrapStack(err error) error {
-	ws := &withStack{}
-	return ws.Wrap(&withMessage{
-		message: w.Message(),
-		cause:   err,
-	})
+	ws := &withStack{
+		error: &withMessage{
+			message: w.Message(),
+			cause:   err,
+		},
+	}
+	if !stackExists(ws) {
+		ws.stack = callers()
+	}
+	return ws
 }
 
 func (w *withMessage) Wrapf(err error, format string, args ...any) error {
@@ -57,11 +62,16 @@ func (w *withMessage) Wrapf(err error, format string, args ...any) error {
 		message: w.Message(),
 		cause:   err,
 	}
-	ws := &withStack{}
-	return ws.Wrap(&withMessage{
-		message: fmt.Sprintf(format, args...),
-		cause:   wm,
-	})
+	ws := &withStack{
+		error: &withMessage{
+			message: fmt.Sprintf(format, args...),
+			cause:   wm,
+		},
+	}
+	if !stackExists(ws) {
+		ws.stack = callers()
+	}
+	return ws
 }
 
 func (w *withMessage) Format(s fmt.State, verb rune) {
@@ -95,14 +105,19 @@ func (w *withCode) Code() int {
 }
 
 func (w *withCode) WrapStack(err error) error {
-	ws := &withStack{}
-	return ws.Wrap(&withCode{
-		withMessage: &withMessage{
-			message: w.Message(),
-			cause:   err,
+	ws := &withStack{
+		error: &withCode{
+			withMessage: &withMessage{
+				message: w.Message(),
+				cause:   err,
+			},
+			code: w.Code(),
 		},
-		code: w.Code(),
-	})
+	}
+	if !stackExists(ws) {
+		ws.stack = callers()
+	}
+	return ws
 }
 
 func (w *withCode) Wrapf(err error, format string, args ...any) error {
@@ -114,12 +129,16 @@ func (w *withCode) Wrapf(err error, format string, args ...any) error {
 		withMessage: wm,
 		code:        w.Code(),
 	}
-
-	ws := &withStack{}
-	return ws.Wrap(&withMessage{
-		message: fmt.Sprintf(format, args...),
-		cause:   wc,
-	})
+	ws := &withStack{
+		error: &withMessage{
+			message: fmt.Sprintf(format, args...),
+			cause:   wc,
+		},
+	}
+	if !stackExists(ws) {
+		ws.stack = callers()
+	}
+	return ws
 }
 
 func (w *withCode) Error() string {
