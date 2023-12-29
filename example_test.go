@@ -372,3 +372,105 @@ func ExampleIs_message() {
 	//isErrOrderNotExists: false
 	//isErrCodeUserNotFound: false
 }
+
+func checkA1() error {
+	return nil
+}
+
+func checkRecover1() (err error) {
+	defer errors.Recover(func(e error) {
+		err = e
+	})
+
+	err = checkA1()
+
+	errors.Check(err)
+	// output
+	fmt.Println("123")
+	return nil
+}
+
+func ExampleCheck_nil() {
+	err := checkRecover1()
+	fmt.Printf("%+v", err)
+
+	// Output:
+	//123
+	//<nil>
+}
+
+func checkA2() error {
+	return errors.WithStack(ErrCodeUserNotFound)
+}
+
+func checkRecover2() (err error) {
+	defer errors.Recover(func(e error) {
+		err = e
+	})
+	err = checkA2()
+	errors.Check(err)
+	// no output
+	fmt.Println("123")
+	return nil
+}
+
+func ExampleCheck_error() {
+	err := checkRecover2()
+	fmt.Printf("%+v", err)
+
+	// Example Output:
+	// 500201010: user not found
+	// github.com/ace-zhaoy/errors_test.checkA2
+	//         /go/src/errors/example_test.go:403
+	// github.com/ace-zhaoy/errors_test.checkRecover2
+	//         /go/src/errors/example_test.go:410
+	// github.com/ace-zhaoy/errors_test.ExampleCheck_error
+	//         /go/src/errors/example_test.go:418
+	// testing.runExample
+	//         /usr/local/go/src/testing/run_example.go:63
+	// testing.runExamples
+	//         /usr/local/go/src/testing/example.go:44
+	// testing.(*M).Run
+	//         /usr/local/go/src/testing/testing.go:1721
+	// main.main
+	//         _testmain.go:85
+	// runtime.main
+	//         /usr/local/go/src/runtime/proc.go:250
+	// runtime.goexit
+	//         /usr/local/go/src/runtime/asm_amd64.s:1571
+}
+
+func checkRecover3() (err error) {
+	defer errors.Recover(func(e error) {
+		err = e
+	})
+	panic("test panic")
+
+	return nil
+}
+
+func ExampleCheck_panic() {
+	err := checkRecover3()
+	fmt.Printf("%+v", err)
+
+	// Example Output:
+	// test panic
+	// runtime.gopanic
+	//         /usr/local/go/src/runtime/panic.go:838
+	// github.com/ace-zhaoy/errors_test.checkRecover3
+	//         /go/src/errors/example_test.go:447
+	// github.com/ace-zhaoy/errors_test.ExampleCheck_panic
+	//         /go/src/errors/example_test.go:453
+	// testing.runExample
+	//         /usr/local/go/src/testing/run_example.go:63
+	// testing.runExamples
+	//         /usr/local/go/src/testing/example.go:44
+	// testing.(*M).Run
+	//         /usr/local/go/src/testing/testing.go:1721
+	// main.main
+	//         _testmain.go:83
+	// runtime.main
+	//         /usr/local/go/src/runtime/proc.go:250
+	// runtime.goexit
+	//         /usr/local/go/src/runtime/asm_amd64.s:1571
+}

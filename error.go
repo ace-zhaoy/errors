@@ -398,3 +398,28 @@ func LatestMessage(err error) ErrorMessage {
 	}
 	return nil
 }
+
+// Recover Use with Check
+func Recover(f ...func(e error)) {
+	if e := recover(); e != nil {
+		err, ok := e.(error)
+		if !ok {
+			err = &withStack{
+				error: &withMessage{
+					message: fmt.Sprintf("%v", e),
+				},
+				stack: callers(),
+			}
+		}
+		for _, v := range f {
+			v(err)
+		}
+	}
+}
+
+// Check Use with Recover
+func Check(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

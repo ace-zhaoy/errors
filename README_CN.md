@@ -352,3 +352,39 @@ func main() {
 }
 
 ```
+
+## 检查 Error
+之前判断错误通常使用下面形式
+```
+func A() error {
+	// ...
+	err := B()
+	if err != nil {
+		return err
+	}
+
+	// ...
+	err = C()
+	if err != nil {
+		return err
+	}
+}
+```
+
+现在可以这么用
+```
+func A() (err error) {
+	defer errors.Recover(func(e error) {
+		err = e
+	})
+
+	err := B()
+	errors.Check(err)
+	// If err is not nil, the code that follows will not execute
+	// ...
+
+	err = C()
+	errors.Check(err)
+	return nil
+}
+```
