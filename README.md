@@ -236,26 +236,26 @@ param: 11
 
 ## Check Error
 It used to be that way
-```go
+```
 func A() error {
 	// ...
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 }
 ```
 
 Now
-```go
+```
 func A() (err error) {
-    defer errors.Recover(func(e error) {
+	defer errors.Recover(func(e error) {
 		err = e
-    })
-	
+	})
+
 	err := B()
-    errors.Check(err)
-    // If err is not nil, the code that follows will not execute
-    // ...
+	errors.Check(err)
+	// If err is not nil, the code that follows will not execute
+	// ...
 	return nil
 }
 ```
