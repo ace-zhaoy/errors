@@ -44,7 +44,11 @@ func (w *withMessage) Unwrap() error {
 	return w.cause
 }
 
+// WrapStack If err is nil, WithStack returns nil.
 func (w *withMessage) WrapStack(err error) error {
+	if err == nil {
+		return nil
+	}
 	ws := &withStack{
 		error: &withMessage{
 			message: w.Message(),
@@ -57,7 +61,11 @@ func (w *withMessage) WrapStack(err error) error {
 	return ws
 }
 
+// Wrapf If err is nil, WithStack returns nil.
 func (w *withMessage) Wrapf(err error, format string, args ...any) error {
+	if err == nil {
+		return nil
+	}
 	wm := &withMessage{
 		message: w.Message(),
 		cause:   err,
@@ -104,7 +112,11 @@ func (w *withCode) Code() int {
 	return w.code
 }
 
+// WrapStack If err is nil, WithStack returns nil.
 func (w *withCode) WrapStack(err error) error {
+	if err == nil {
+		return nil
+	}
 	ws := &withStack{
 		error: &withCode{
 			withMessage: &withMessage{
@@ -120,7 +132,11 @@ func (w *withCode) WrapStack(err error) error {
 	return ws
 }
 
+// Wrapf If err is nil, WithStack returns nil.
 func (w *withCode) Wrapf(err error, format string, args ...any) error {
+	if err == nil {
+		return nil
+	}
 	wm := &withMessage{
 		message: w.Message(),
 		cause:   err,

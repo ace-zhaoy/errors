@@ -191,7 +191,7 @@ func TestNewWithStack(t *testing.T) {
 			args{
 				format: "aaa",
 			},
-			[]string{"aaa", "TestNewWithStack.func1", "error_test.go:208", "testing.tRunner", "testing.go:1439", "runtime.goexit", "runtime"},
+			[]string{"aaa", "TestNewWithStack.func1", "error_test.go", "testing.tRunner", "testing.go:1439", "runtime.goexit", "runtime"},
 		},
 	}
 	for _, tt := range tests {
