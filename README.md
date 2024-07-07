@@ -259,3 +259,30 @@ func A() (err error) {
 	return nil
 }
 ```
+
+## Error join
+```go
+err1 := errors.New("error 1")
+err2 := errors.New("error 2")
+err := errors.Join(err1, err2)
+
+fmt.Println(errors.Is(err, err1))
+// output: true
+
+fmt.Println(errors.Is(err, err2))
+// output: true
+```
+
+```go
+err := errors.NewWithJoin()
+err1 := errors.New("error 1")
+err2 := errors.New("error 2")
+err.Append(err1)
+err.Append(err2)
+
+fmt.Println(errors.Is(err, err1))
+// output: true
+
+fmt.Println(errors.Is(err, err2))
+// output: true
+```
