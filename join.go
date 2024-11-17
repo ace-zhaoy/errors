@@ -37,6 +37,8 @@ type ErrorJoin interface {
 	error
 	Append(error)
 	Unwrap() []error
+	Len() int
+	ToError() error
 }
 
 type withJoin struct {
@@ -94,4 +96,15 @@ func (w *withJoin) Format(s fmt.State, verb rune) {
 			io.WriteString(s, err.Error())
 		}
 	}
+}
+
+func (w *withJoin) Len() int {
+	return len(w.errs)
+}
+
+func (w *withJoin) ToError() error {
+	if len(w.errs) == 0 {
+		return nil
+	}
+	return w
 }
