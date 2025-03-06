@@ -439,3 +439,41 @@ func Check(err error) {
 		panic(err)
 	}
 }
+
+func CheckWithStack(err error) {
+	if err == nil {
+		return
+	}
+	if stackExists(err) {
+		panic(err)
+	}
+	if e, ok := err.(*withStack); ok {
+		e.stack = callers()
+		panic(e)
+	}
+	panic(&withStack{
+		error: err,
+		stack: callers(),
+	})
+}
+
+func CheckWithWrap(err error, format string, args ...any) {
+	if err == nil {
+		return
+	}
+	err = &withMessage{
+		message: fmt.Sprintf(format, args...),
+		cause:   err,
+	}
+	if stackExists(err) {
+		panic(err)
+	}
+	if e, ok := err.(*withStack); ok {
+		e.stack = callers()
+		panic(e)
+	}
+	panic(&withStack{
+		error: err,
+		stack: callers(),
+	})
+}

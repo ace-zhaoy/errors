@@ -444,3 +444,133 @@ func TestWrap(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckWithStack(t *testing.T) {
+	tests := []struct {
+		name    string
+		err     error
+		wantErr string
+	}{
+		{
+			"nil error",
+			nil,
+			"",
+		},
+		{
+			"regular error",
+			errors.New("regular error"),
+			"regular error",
+		},
+		{
+			"error with stack",
+			WithStack(errors.New("with stack")),
+			"with stack",
+		},
+		{
+			"error code",
+			ErrCodeUserNotFound,
+			"[500201010: user not found]",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.err == nil {
+				CheckWithStack(tt.err)
+				return
+			}
+
+			defer func() {
+				if r := recover(); r != nil {
+					err, ok := r.(error)
+					if !ok {
+						t.Errorf("Expected panic with error, got %v", r)
+						return
+					}
+
+					if !strings.Contains(err.Error(), tt.wantErr) {
+						t.Errorf("CheckWithStack() panicked with = %v, want containing %v", err, tt.wantErr)
+					}
+
+					_, hasStack := r.(*withStack)
+					if !hasStack && !stackExists(err) {
+						t.Errorf("CheckWithStack() error should have stack information")
+					}
+				}
+			}()
+
+			CheckWithStack(tt.err)
+			t.Errorf("CheckWithStack() did not panic as expected")
+		})
+	}
+}
+
+func TestCheckWithWrap(t *testing.T) {
+	tests := []struct {
+		name    string
+		err     error
+		format  string
+		args    []any
+		wantErr string
+	}{
+		{
+			"nil error",
+			nil,
+			"format",
+			nil,
+			"",
+		},
+		{
+			"regular error",
+			errors.New("regular error"),
+			"wrapped error: %s",
+			[]any{"additional info"},
+			"wrapped error: additional info -> {regular error}",
+		},
+		{
+			"error with stack",
+			WithStack(errors.New("with stack")),
+			"wrapped error: %s",
+			[]any{"additional info"},
+			"wrapped error: additional info -> {with stack}",
+		},
+		{
+			"error code",
+			ErrCodeUserNotFound,
+			"wrapped error: %s",
+			[]any{"additional info"},
+			"wrapped error: additional info -> {[500201010: user not found]}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.err == nil {
+				CheckWithWrap(tt.err, tt.format, tt.args...)
+				return
+			}
+
+			defer func() {
+				if r := recover(); r != nil {
+					err, ok := r.(error)
+					if !ok {
+						t.Errorf("Expected panic with error, got %v", r)
+						return
+					}
+
+					if !strings.Contains(err.Error(), tt.wantErr) {
+						t.Errorf("CheckWithWrap() panicked with = %v, want containing %v", err, tt.wantErr)
+					}
+
+					_, hasStack := r.(*withStack)
+					if !hasStack && !stackExists(err) {
+						t.Errorf("CheckWithWrap() error should have stack information")
+					}
+				}
+			}()
+
+			CheckWithWrap(tt.err, tt.format, tt.args...)
+			t.Errorf("CheckWithWrap() did not panic as expected")
+		})
+	}
+}
