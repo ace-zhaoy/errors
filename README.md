@@ -31,7 +31,10 @@ func ReturnNil() error {
 func main() {
 	err := OpenFile()
 	fmt.Printf("%+v\n", err)
-	fmt.Println("------------")
+	fmt.Println("\n------------\n")
+
+	fmt.Printf("%v\n", err)
+	fmt.Println("\n------------\n")
 
 	err = ReturnNil()
 	fmt.Printf("%+v\n", err)
@@ -49,7 +52,13 @@ runtime.main
         /usr/local/go/src/runtime/proc.go:250
 runtime.goexit
         /usr/local/go/src/runtime/asm_amd64.s:1571
+
 ------------
+
+open ./test.err: no such file or directory
+
+------------
+
 <nil>
 
 ```
@@ -66,7 +75,7 @@ import (
 
 func A() error {
 	_, err := os.Open("./test.err")
-	return errors.WithStack(err)
+	return errors.Wrap(err, "failed to open file")
 }
 
 func B() error {
@@ -82,6 +91,9 @@ func C() error {
 func main() {
 	err := C()
 	fmt.Printf("%+v\n", err)
+	fmt.Println("\n------------\n")
+
+	fmt.Printf("%v\n", err)
 }
 
 ```
@@ -89,6 +101,7 @@ func main() {
 Output:
 ```
 open ./test.err: no such file or directory
+failed to open file
 main.A
         /go/src/test/err/main.go:11
 main.B
@@ -100,7 +113,11 @@ main.main
 runtime.main
         /usr/local/go/src/runtime/proc.go:250
 runtime.goexit
-        /usr/local/go/src/runtime/asm_amd64.s:157
+        /usr/local/go/src/runtime/asm_amd64.s:1571
+
+------------
+
+failed to open file -> {open ./test.err: no such file or directory}
 ```
 
 ## Error code
@@ -161,11 +178,11 @@ Output:
 ```
 error code: 400102030
 error msg: invalid params
-error err: [400102030: invalid params] -> {param: id: 1 -> {[500201010: user not found] -> {record not found}}}
+error err: [400102030: invalid params] -> {[500201010: user not found] -> {param: id: 1 -> {record not found}}}
 ---------------------
 record not found
-500201010: user not found
 param: id: 1
+500201010: user not found
 main.SqlFirst
         /go/src/test/err/main.go:27
 main.Server

@@ -309,8 +309,8 @@ func ExampleLatestMessage() {
 	// Output:
 	//ErrUserNotFound: user not found
 	//ErrInvalidParams: invalid params
-	//latestErr: param <123> -> {invalid params -> {user not found}}
-	//otherErr: service err -> {param <123> -> {invalid params -> {user not found}}}
+	//latestErr: invalid params -> {param <123> -> {user not found}}
+	//otherErr: service err -> {invalid params -> {param <123> -> {user not found}}}
 }
 
 func ExampleIs_code() {

@@ -140,21 +140,21 @@ func main() {
 // Output:
 // error code: 400102030
 // error msg: invalid params
-// error err: [400102030: invalid params] -> {param: id: 1 -> {[500201010: user not found] -> {record not found}}}
+// error err: [400102030: invalid params] -> {[500201010: user not found] -> {param: id: 1 -> {record not found}}}
 // ---------------------
 // record not found
-// 500201010: user not found
 // param: id: 1
+// 500201010: user not found
 // main.SqlFirst
-//         /go/src/test/err/main.go:27
+// /go/src/test/err/main.go:27
 // main.Server
-//         /go/src/test/err/main.go:31
+// /go/src/test/err/main.go:31
 // main.main
-//         /go/src/test/err/main.go:43
+// /go/src/test/err/main.go:43
 // runtime.main
-//         /usr/local/go/src/runtime/proc.go:250
+// /usr/local/go/src/runtime/proc.go:250
 // runtime.goexit
-//         /usr/local/go/src/runtime/asm_amd64.s:1571
+// /usr/local/go/src/runtime/asm_amd64.s:1571
 // 400102030: invalid params
 ```
 

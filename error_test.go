@@ -27,40 +27,31 @@ var (
 )
 
 func TestNew(t *testing.T) {
-	type args struct {
-		format string
-	}
 	tests := []struct {
 		name    string
-		args    args
-		wantErr error
+		input   string
+		wantErr string
 	}{
 		{
-			"new abc - fmt.Errorf",
-			args{
-				format: "abc",
-			},
-			fmt.Errorf("abc"),
+			name:    "new abc",
+			input:   "abc",
+			wantErr: "abc",
 		},
 		{
-			"new abc - errors.New",
-			args{
-				format: "abc",
-			},
-			errors.New("abc"),
-		},
-		{
-			"new abc",
-			args{
-				format: "abc",
-			},
-			New("abc"),
+			name:    "empty string",
+			input:   "",
+			wantErr: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := New(tt.args.format); err.Error() != tt.wantErr.Error() {
-				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+			err := New(tt.input)
+			if err == nil {
+				t.Errorf("New() returned nil, want error")
+				return
+			}
+			if err.Error() != tt.wantErr {
+				t.Errorf("New() error = %v, want %v", err.Error(), tt.wantErr)
 			}
 		})
 	}
@@ -94,10 +85,8 @@ func TestNewWithCode(t *testing.T) {
 				args:   []any{"bbb"},
 			},
 			&withCode{
-				withMessage: &withMessage{
-					message: "aaa: bbb",
-				},
-				code: 100,
+				code:    100,
+				message: "aaa: bbb",
 			},
 		},
 		{
@@ -107,8 +96,8 @@ func TestNewWithCode(t *testing.T) {
 				format: "",
 			},
 			&withCode{
-				withMessage: &withMessage{},
-				code:        200,
+				code:    200,
+				message: "",
 			},
 		},
 	}

@@ -66,14 +66,14 @@ func (w *withMessage) Wrapf(err error, format string, args ...any) error {
 	if err == nil {
 		return nil
 	}
-	wm := &withMessage{
-		message: w.Message(),
+	wm := withMessage{
+		message: fmt.Sprintf(format, args...),
 		cause:   err,
 	}
 	ws := &withStack{
 		error: &withMessage{
-			message: fmt.Sprintf(format, args...),
-			cause:   wm,
+			message: w.message,
+			cause:   &wm,
 		},
 	}
 	if !stackExists(ws) {
@@ -104,12 +104,25 @@ type ErrorCode interface {
 }
 
 type withCode struct {
-	*withMessage
-	code int
+	code    int
+	message string
+	cause   error
 }
 
 func (w *withCode) Code() int {
 	return w.code
+}
+
+func (w *withCode) Message() string {
+	return w.message
+}
+
+func (w *withCode) Cause() error {
+	return w.cause
+}
+
+func (w *withCode) Unwrap() error {
+	return w.cause
 }
 
 // WrapStack If err is nil, WithStack returns nil.
@@ -119,11 +132,9 @@ func (w *withCode) WrapStack(err error) error {
 	}
 	ws := &withStack{
 		error: &withCode{
-			withMessage: &withMessage{
-				message: w.Message(),
-				cause:   err,
-			},
-			code: w.Code(),
+			code:    w.code,
+			message: w.message,
+			cause:   err,
 		},
 	}
 	if !stackExists(ws) {
@@ -137,19 +148,17 @@ func (w *withCode) Wrapf(err error, format string, args ...any) error {
 	if err == nil {
 		return nil
 	}
-	wm := &withMessage{
-		message: w.Message(),
+	wm := withMessage{
+		message: fmt.Sprintf(format, args...),
 		cause:   err,
 	}
-	wc := &withCode{
-		withMessage: wm,
-		code:        w.Code(),
+	wc := withCode{
+		code:    w.code,
+		message: w.message,
+		cause:   &wm,
 	}
 	ws := &withStack{
-		error: &withMessage{
-			message: fmt.Sprintf(format, args...),
-			cause:   wc,
-		},
+		error: &wc,
 	}
 	if !stackExists(ws) {
 		ws.stack = callers()
@@ -158,11 +167,11 @@ func (w *withCode) Wrapf(err error, format string, args ...any) error {
 }
 
 func (w *withCode) Error() string {
-	s := fmt.Sprintf("[%d: %s]", w.Code(), w.Message())
-	if w.Cause() == nil {
+	s := fmt.Sprintf("[%d: %s]", w.code, w.message)
+	if w.cause == nil {
 		return s
 	}
-	return fmt.Sprintf("%s -> {%s}", s, w.Cause())
+	return fmt.Sprintf("%s -> {%s}", s, w.cause)
 }
 
 func (w *withCode) Is(err error) bool {
@@ -176,10 +185,10 @@ func (w *withCode) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if s.Flag('+') {
-			if w.Cause() != nil {
-				fmt.Fprintf(s, "%+v\n", w.Cause())
+			if w.cause != nil {
+				fmt.Fprintf(s, "%+v\n", w.cause)
 			}
-			fmt.Fprintf(s, "%d: %s", w.Code(), w.Message())
+			fmt.Fprintf(s, "%d: %s", w.code, w.message)
 			return
 		}
 		fallthrough
@@ -273,10 +282,8 @@ func NewWithMessage(format string, args ...any) ErrorMessage {
 // NewWithCode no stack
 func NewWithCode(code int, format string, args ...any) ErrorCode {
 	return &withCode{
-		code: code,
-		withMessage: &withMessage{
-			message: fmt.Sprintf(format, args...),
-		},
+		code:    code,
+		message: fmt.Sprintf(format, args...),
 	}
 }
 
